@@ -10,13 +10,53 @@
 
 (defn winner-check [board]
 	(for [vector winning-vectors]
-		(if (and (= (board (first vector)) (board (second vector)) (board (last vector))) 
-			(not= (board (first vector)) nil))
+		(if (and (= (board (first vector)) (board (second vector)) (board (last vector))) (not= (board (first vector)) nil))
 			(board (first vector))
 			nil)))
 
 (defn winner [board]
 	(some #{player1 player2} (winner-check board)))
+
+(defn whose-turn [board]
+	(if (and (>= (count board) 0) (< (count board) 9))
+		(cond (even? (count board)) player1
+			  (odd? (count board)) player2)
+		nil))
+
+;AI and Minimax
+(defn other-player [player]
+	(cond (= player player1) player2
+		  (= player player2) player1
+		  :else nil))
+
+(defn empty-spaces [board]
+	(remove (fn [k] (contains? board k)) (range 1 10)))
+
+(defn full-board? [board]
+	(if (empty? (empty-spaces board)) 
+		true
+		false))
+
+(defn score-board [player board]
+	(cond (= (winner board) player) 10
+		  (= (winner board) (other-player player)) -10
+		  (= (full-board? board) true) 0
+		  :else nil))
+
+(defn minimax [player board]
+	;should return an int that is the move to be made
+	;makes a move and scores it accordingly, if not finished minimax that board as the opposite player .
+	;Enumerate through the empty-spaces with make-move.
+	;For each make-move board score the board with either 10 -10 or 0 based on if player wins
+
+	; (for [move (empty-spaces board)]
+	; 	(cond (= score-board (make-move board move player) 10) move
+	; 		  (= score-board (make-move board move)))))
+)
+
+(defn get-computer-move [board]
+	;If it's the end of the game whose-turn will return nil check for this to end game?
+	(minimax (whose-turn board) board))
 
 ;Terminal stuff - move to other file later.
 
@@ -32,12 +72,11 @@
 (defn process-move [input board]
 	(cond (contains? board input)
 		((println "That space is taken!!!")
-		(prompt-for-move board))
-		(or (> input 9) (< input 1))
+			(prompt-for-move board))
+		(or (> input 9) (< input 1)) 
 		(prompt-for-move board)
-		:else
-		(println "please get better")
-		))
+		:else 
+		(println "please get better")))
 
 (defn prompt-for-move [board]
 	(render-board board)
@@ -45,7 +84,7 @@
 	(flush)
 	(process-move ((read-line) board)))
 	
-(defn get-computer-move [board]
+(defn get-computer-move [player board]
 	(println "get-computer-move"))
 
 (defn prompt-for-initial-input []
