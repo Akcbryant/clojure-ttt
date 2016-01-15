@@ -1,9 +1,11 @@
 (ns clojure-ttt.core)
 
-(def player1 "X")
-(def player2 "O")
+(def X "X")
+(def O "O")
 (def empty-board {})
 (def winning-vectors [[1,2,3] [4,5,6] [7,8,9] [1,5,9] [1,4,7] [2,5,8] [3,6,9] [3,5,7]])
+
+(declare full-board?)
 
 (defn make-move [board position player]
 	(merge board {position player}))
@@ -15,18 +17,26 @@
 			nil)))
 
 (defn winner [board]
-	(some #{player1 player2} (winner-check board)))
+	(some #{X O} (winner-check board)))
 
 (defn whose-turn [board]
 	(if (and (>= (count board) 0) (< (count board) 9))
-		(cond (even? (count board)) player1
-			  (odd? (count board)) player2)
+		(cond (even? (count board)) X
+			  (odd? (count board)) O)
 		nil))
 
+(defn game-ended? [board]
+	(if (or (full-board? board) (winner board)) 
+		true
+		false))
+
 ;AI and Minimax
+(declare get-min)
+(declare minimax)
+
 (defn other-player [player]
-	(cond (= player player1) player2
-		  (= player player2) player1
+	(cond (= player X) O
+		  (= player O) X
 		  :else nil))
 
 (defn empty-spaces [board]
@@ -37,28 +47,28 @@
 		true
 		false))
 
-(defn score-board [player board]
-	(cond (= (winner board) player) 10
-		  (= (winner board) (other-player player)) -10
+(defn score-board [player board maximum]
+	(cond (= (winner board) player) (if maximum 10 -10)
+		  (= (winner board) (other-player player)) (if maximum -10 10)
 		  (= (full-board? board) true) 0
-		  :else nil))
+		  :else (second (minimax (other-player player) board (not maximum)))))
 
-(defn minimax [player board]
-	;should return an int that is the move to be made
-	;makes a move and scores it accordingly, if not finished minimax that board as the opposite player .
-	;Enumerate through the empty-spaces with make-move.
-	;For each make-move board score the board with either 10 -10 or 0 based on if player wins
+(defn next-boards [player board]
+	(map #(make-move board % player) (empty-spaces board)))
 
-	; (for [move (empty-spaces board)]
-	; 	(cond (= score-board (make-move board move player) 10) move
-	; 		  (= score-board (make-move board move)))))
-)
+(defn minimax [player board maximum]
+	(let [moves (empty-spaces board)
+		scores (map #(score-board player (make-move board % player) maximum) moves)
+		score-moves (partition 2 (interleave moves scores))
+		sorted-score-moves (sort-by second score-moves)]
+		(if maximum 
+			(last sorted-score-moves)
+			(first sorted-score-moves))))
 
-(defn get-computer-move [board]
-	;If it's the end of the game whose-turn will return nil check for this to end game?
-	(minimax (whose-turn board) board))
+(defn best-move [player board]
+	(first (minimax player board true)))
 
-;Terminal stuff - move to other file later.
+;TODO Terminal stuff - move to other file.
 
 ;Forward Declarations
 (declare process-initial-input)
@@ -95,12 +105,12 @@
 
 (defn process-initial-input [input]
 	(cond (or (= input "X") (= input "x"))
-		(prompt-for-move empty-board)
+			(prompt-for-move empty-board)
 		  (or (= input "O") (= input "o"))
-		(get-computer-move empty-board)
-		:else
-		((println "This is not the time for GAMES!!!")
-		(prompt-for-initial-input))))
+			(get-computer-move empty-board)
+		  :else
+			((println "This is not the time for GAMES!!!")
+			(prompt-for-initial-input))))
 
 (defn -main []
 	(prompt-for-initial-input))
