@@ -72,7 +72,7 @@
 	(it "best-move should return the next optimal move."
 		(should= 7 (best-move O {1 O 2 X 3 X 4 X 5 X 6 O 8 O}))
 		(should= 5 (best-move X {1 O 2 X 3 O 4 X}))
-		(should= 1 (best-move X {}))))
+		(should= 9 (best-move X {}))))
  
 
 ; Interactivity and UI tests probably to be moved put it down here.
