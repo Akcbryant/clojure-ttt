@@ -1,5 +1,5 @@
 # clojure-ttt
 
-RUN: lein run
+# RUN: lein run
 
-TEST: lein spec
+# TEST: lein spec
