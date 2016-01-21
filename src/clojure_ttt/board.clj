@@ -10,6 +10,10 @@
 (defn make-move [board position player]
   (merge board {position player}))
 
+(defn valid-move? [board position]
+  (if (get board position) false
+    true))
+
 (defn winner-check [board]
   (for [vector winning-vectors]
     (if (and (= (board (first vector)) (board (second vector)) (board (last vector))) (not= (board (first vector)) nil))

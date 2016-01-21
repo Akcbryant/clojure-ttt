@@ -11,6 +11,12 @@
   		(should= {9 X} (make-move empty-board 9 X))
   		(should= {1 X 2 O 9 O} (make-move {1 X 2 O} 9 O)))
 
+    (it "Should return true if a player moves into an open spot."
+      (should= true (valid-move? {} 1)))
+
+    (it "Should return false if someone moves in the taken 5th spot."
+      (should= false (valid-move? {1 O 5 X} 5)))
+
     (it "Check if there is a winner otherwise return nil."
   		(should= nil (winner empty-board))
   		(should= nil (winner {1 X 2 O}))
