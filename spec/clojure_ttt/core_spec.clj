@@ -10,4 +10,6 @@
   (it "Uses the minimax function to grab a board with the next AI move made."
     (should= {9 O} (ai-move {} O))))
 
+(describe "Play a game with the computer.")
+
 (run-specs)

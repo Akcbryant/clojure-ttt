@@ -14,6 +14,7 @@
           (= humans 2) (play-game human-move human-move {} X)
           (= humans 0) (play-game ai-move ai-move {} X)))) 
 
+;; a move takes a board and a piece and returns the next move someone wants to make
 (defn ai-move [board piece]
   (computer-processing)
   (make-move board (best-move piece board) piece))
@@ -29,7 +30,7 @@
     (winner-message winner)
     (if (game-ended? board) 
       (tie-message)
-      (if (= X whose-turn)
+      (if (= whose-turn X)
         (play-game player1-move player2-move (player1-move board whose-turn) (other-player whose-turn))
         (play-game player1-move player2-move (player2-move board whose-turn) (other-player whose-turn))))))
 

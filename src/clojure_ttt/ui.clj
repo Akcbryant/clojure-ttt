@@ -7,8 +7,7 @@
   (read-line))
 
 (defn input-error []
-  (println "Invalid input.")
-  (flush))
+  (println "Invalid input."))
 
 (defn welcome-message []
   (println "Welcome to tic-tac-toe."))
@@ -20,7 +19,8 @@
       ((input-error)(get-piece)))))
 
 (defn how-many-humans []
-  (let [humans (Integer/parseInt (prompt-for-input "How many humans are playing today?"))]
+  (let [humans (try (Integer/parseInt (prompt-for-input "How many humans are playing today?"))
+                    (catch java.lang.NumberFormatException e ((println "Try a number between 1-9!") (how-many-humans))))]
     (if (and (>= humans 0) (<= humans 2))
       humans
       ((input-error) (how-many-humans)))))
