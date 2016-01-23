@@ -16,6 +16,7 @@
     (let [render-board-called (atom 0)]
       (with-redefs [ui/render-board (fn [_] (reset! render-board-called 1))]
         (core/play-game core/ai-move core/ai-move {} board/X)
+        ;compare boards using mock fn from ant-game
         (should= 1 @render-board-called)))))
 
 (run-specs)
