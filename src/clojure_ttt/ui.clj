@@ -1,5 +1,4 @@
-(ns clojure-ttt.ui
-  (:require [clojure-ttt.board :refer :all]))
+(ns clojure-ttt.ui)
 
 (defn prompt-for-input [string]
   (println string)

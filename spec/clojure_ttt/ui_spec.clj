@@ -1,7 +1,6 @@
 (ns clojure-ttt.ui-spec
   (:require [speclj.core :refer :all]
-        [clojure-ttt.ui :refer :all]
-        [clojure-ttt.board :refer :all]))
+        [clojure-ttt.ui :refer :all]))
 
 (describe "Manage the input from the user and display appropriate messages."
   (it "Basic prompt accepts and returns input."
@@ -31,7 +30,7 @@
   (it "Gets move 5 for player1"
     (should= 5 (with-in-str "5" (get-move "player1"))))
   (it "Sends an error message if get-move is given a letter."
-    (should= (with-out-str (input-error)) (with-in-str "q" (get-move "player1"))))
+    (should= (with-out-str (input-error)) (with-in-str "q" (get-move "player1")))
 
 
   (it "Displays the winner is Player 1."
@@ -56,7 +55,7 @@
                   "   |   |   \n") (with-out-str (render-board {}))))
 
   (it "Should fill in the appropriate spaces automatically."
-    (should= (str "_"X"_|_"O"_|_"X"_\n"
-                  "_"O"_|_"X"_|_"O"_\n"
+    (should= (str "_X_|_O_|_X_\n"
+                  "_O_|_X_|_O_\n"
                   "   |   |   \n")
-      (with-out-str (render-board {1 X 2 O 3 X 4 O 5 X 6 O} )))))
+      (with-out-str (render-board {1 "X" 2 "O" 3 "X" 4 "O" 5 "X" 6 "O"} )))))
