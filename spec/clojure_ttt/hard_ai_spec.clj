@@ -1,4 +1,4 @@
-(ns clojure-ttt.ai-spec
+(ns clojure-ttt.hard-ai-spec
   (:require [speclj.core :refer :all]
         [clojure-ttt.ai] :refer :all]))
 
@@ -21,25 +21,6 @@
     (should= 5 (best-move X {1 O 2 X 3 O 4 X}))
     (should= 9 (best-move X {})))
 
-  (it "Should return a list of the possible next boards given the player that is moving next."
-    (should= '({1 "X"} {2 "X"} {3 "X"} {4 "X"} {5 "X"} {6 "X"} {7 "X"} {8 "X"} {9 "X"})
-          (next-boards X {}))
-
-    (should= '({1 "O", 2 "X"}
-               {1 "O", 3 "X"}
-               {1 "O", 4 "X"}
-               {1 "O", 5 "X"}
-               {1 "O", 6 "X"}
-               {1 "O", 7 "X"}
-               {1 "O", 8 "X"}
-               {1 "O", 9 "X"})
-              (next-boards X {1 O}))
-
-    (should= '({1 "O", 2 "O", 3 "O", 4 "O"}
-               {1 "O", 2 "O", 3 "O", 5 "O"}
-               {1 "O", 2 "O", 3 "O", 6 "O"}
-               {1 "O", 2 "O", 3 "O", 7 "O"}
-               {1 "O", 2 "O", 3 "O", 8 "O"}
-               {1 "O", 2 "O", 3 "O", 9 "O"})
-          (next-boards O {1 O 2 O 3 O}))))
-
+(describe "When asked to make a move"
+  (it "returns a board with the next move made"
+    (should= {1 O 2 O 3 X 6 X 9 X} (move {1 O 2 O 6 X 9 X} X))))

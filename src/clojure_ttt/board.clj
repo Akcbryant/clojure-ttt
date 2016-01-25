@@ -46,3 +46,6 @@
   (if (empty? (empty-spaces board)) 
     true
     false))
+
+(defn next-boards [player board]
+  (map #(make-move board % player) (empty-spaces board)))
