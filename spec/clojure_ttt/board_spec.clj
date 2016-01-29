@@ -74,11 +74,31 @@
 		(should= '(1 3 5 7 9) (empty-spaces {2 X 4 O 6 X 8 O}))
 		(should= '() (empty-spaces {1 X 2 X 3 X 4 O 5 O 6 O 7 O 8 O 9 X})))
 
-
 	(it "Should return true if the game is full and false if there are places yet to go"
 		(should= false (full-board? {}))
 		(should= false (full-board? {1 X 2 O 3 X}))
 		(should= true (full-board? {1 X 2 X 3 X 4 O 5 O 6 O 7 O 8 O 9 X}))))
 
+(describe "Current depth - "
+  (it "Introspect the board to return the current depth."
+    (should= 0 (current-depth {}))
+    (should= 1 (current-depth {1 X}))
+    (should= 2 (current-depth {1 X 2 O}))
+    (should= 3 (current-depth {1 X 2 O 3 X}))
+    (should= 4 (current-depth {1 X 2 O 3 X
+                               4 O }))
+    (should= 5 (current-depth {1 X 2 O 3 X
+                               4 O 5 X }))
+    (should= 6 (current-depth {1 X 2 O 3 X
+                               4 O 5 X 6 X}))
+    (should= 7 (current-depth {1 X 2 O 3 X
+                               4 O 5 X 6 X
+                               7 O }))
+    (should= 8 (current-depth {1 X 2 O 3 X
+                               4 O 5 X 6 X
+                               7 O 8 X }))
+    (should= 9 (current-depth {1 X 2 O 3 X
+                               4 O 5 X 6 X
+                               7 O 8 X 9 O}))))
 (run-specs)
 

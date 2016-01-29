@@ -49,3 +49,6 @@
 
 (defn next-boards [player board]
   (map #(make-move board % player) (empty-spaces board)))
+
+(defn current-depth [board]
+  (count board))
