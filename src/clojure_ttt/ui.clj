@@ -19,7 +19,7 @@
 
 (defn how-many-humans []
   (let [humans (try (Integer/parseInt (prompt-for-input "How many humans are playing today?"))
-                    (catch java.lang.NumberFormatException e ((println "Try a number between 1-9!") (how-many-humans))))]
+                    (catch java.lang.NumberFormatException e ((println "Try a number between 0 and 2!") (how-many-humans))))]
     (if (and (>= humans 0) (<= humans 2))
       humans
       ((input-error) (how-many-humans)))))
@@ -29,7 +29,7 @@
 
 (defn get-move [player]
   (let [move (Integer/parseInt (prompt-for-input (str "Where does " player " want to move? Choose 1-9")))]
-    (if (and (>= move 1) (<= move 9))
+    (if (and (>= move 0) (<= move 8))
       move
       ((input-error) (get-move player)))))
 

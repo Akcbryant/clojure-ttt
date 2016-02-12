@@ -2,103 +2,101 @@
 	(:require [speclj.core :refer :all]
 			  [clojure-ttt.board :refer :all]))
 
-(describe "Board Logic"
-  (it "X refers to 'X' and O refers to 'O'. Empty-board is empty."
-  	(should= {} empty-board)
-  	(should= {0 "X" 1 "O" 2 "X" 3 "O"} {0 X, 1 O, 2 X, 3 O}))
+(tags :board)
 
-  (it "Makes a new board when given a board, move position, and player."
-		(should= {9 X} (make-move empty-board 9 X))
-		(should= {1 X 2 O 9 O} (make-move {1 X 2 O} 9 O)))
+(def empty-board [0 0 0 0 0 0 0 0 0])
 
-  (it "Should return true if a player moves into an open spot."
-    (should= true (valid-move? {} 1)))
+(describe "Board data structures"
+  (it "1 refers to 'X' and -1 refers to 'O' and 0 is empty"
+    (should= [1 -1 1 -1 0 0 0 0 0 ] [X O X O 0 0 0 0 0])))
+  
+(describe "make-move"
+  (it "returns a board with the specified move made on the board provided"
+    (should= [0 0 0 0 0 0 0 0 X] (make-move empty-board 8 X))))
 
-  (it "Should return false if someone moves in the taken 5th spot."
-    (should= false (valid-move? {1 O 5 X} 5)))
+(describe "valid-move?"
+  (it "Should return true if a player moves into the open spot."
+    (should= true (valid-move? empty-board 1)))
+  (it "Should return false if someone moves into a taken 5th spot."
+    (should= false (valid-move? [X O X X O X 0 0 0] 5))))
 
-  (it "Check if there is a winner otherwise return nil."
-		(should= nil (winner empty-board))
-		(should= nil (winner {1 X 2 O}))
-		(should= nil (winner {1 X 2 O 3 X 4 O 5 O 6 X 7 X 8 X 9 O}))
-		(should= X (winner {1 X 2 X 3 X}))
-		(should= X (winner {1 X 2 O 3 X 4 O 5 X 6 O 7 X 8 O 9 X}))
-	(should= O (winner {1 O 2 O 3 O}))
-	(should= O (winner {1 O 2 O 3 X 4 X 5 O 6 O 7 O 8 O 9 X}))
-	;This test shows that if both players have a winning position then this returns the first one to be found in the winner list.
-	(should= X (winner {1 X 2 X 3 X 4 O 5 O 6 O 7 O 8 O 9 X})))
+(describe "board-width"
+  (it "convenience method to get the square root of a board to give the width"
+    (should= 3 (board-width (repeat 9 0)))
+    (should= 4 (board-width (repeat 16 0)))))
 
-  (it "Get player who is making the move based on introspecting the board."
-		(should= X (whose-turn empty-board))
-		(should= O (whose-turn {1 X}))
-		(should= X (whose-turn {1 X 2 O}))
-		(should= O (whose-turn {1 X 2 O 3 X}))
-		(should= nil (whose-turn {1 X 2 O 3 X 4 O 5 X 6 O 7 X 8 O 9 X})))
+(describe "board-matrix"
+  (it "make a matrix from a 3 X 3 board"
+    (should= [[X 0 X] [0 0 0] [0 0 0]] (board-matrix [X 0 X 0 0 0 0 0 0])))
+  (it "make a matrix from a 4 X 4 board"
+    (should= [[X 0 X 0] [X 0 0 0] [0 X X 0] [X 0 X 0]] (board-matrix [X 0 X 0 X 0 0 0 0 X X 0 X 0 X 0]))))
 
-  (it "Returns true or false depending on whether the game has reached a possible end state."
-		(should= false (game-ended? {}))
-		(should= false (game-ended? {1 X 2 O 3 X}))
-		(should= true  (game-ended? {1 X 2 X 3 X}))
-		(should= true  (game-ended? {1 X 2 X 3 X 4 O 5 O 6 O 7 O 8 O 9 X}))
-		(should= true  (game-ended? {1 O 2 O 3 O})))
+(describe "rows-columns"
+  (it "returns a vector of the rows and columns for a 3 X 3 board"
+    (should= [[1 0 0][0 1 0][0 0 1][1 0 0][0 1 0][0 0 1]] (rows-columns [[1 0 0][0 1 0][0 0 1]])))
+  (it "returns a vector of the rows and columns for a 4 X 4 board"
+    (should= [[1 0 0 0] [-1 0 0 0] [0 1 1 1] [0 1 1 0] [1 -1 0 0] [0 0 1 1][ 0 0 1 1][0 0 1 0]]
+             (rows-columns [[1 0 0 0] [-1 0 0 0] [0 1 1 1] [0 1 1 0]]))))
 
-  (it "Should return a list of the possible next boards given the player that is moving next."
-  (should= '({1 "X"} {2 "X"} {3 "X"} {4 "X"} {5 "X"} {6 "X"} {7 "X"} {8 "X"} {9 "X"})
-        (next-boards X {}))
+(describe "diagonals"
+  (it "returns the diagonals of a 3 X 3 board"
+    (should= [[1 0 1] [1 0 1]] (diagonals [[1 0 1] [0 0 0] [1 0 1]])))
+  (it "returns the diagonals of a 4 X 4 board"
+    (should= [[1 0 0 1][1 0 0 1]](diagonals [[1 0 0 1][0 0 0 0][0 0 0 0][1 0 0 1]]))))
 
-  (should= '({1 "O", 2 "X"}
-             {1 "O", 3 "X"}
-             {1 "O", 4 "X"}
-             {1 "O", 5 "X"}
-             {1 "O", 6 "X"}
-             {1 "O", 7 "X"}
-             {1 "O", 8 "X"}
-             {1 "O", 9 "X"})
-            (next-boards X {1 O}))
+(describe "winner"
+  (it "returns X if X has won on a 3 X 3 board"
+    (should= X (winner [X X X 0 0 0 0 0 0])))
+  (it "returns O if O has won on a 3 X 3 board"
+    (should= O (winner [O X O O 0 0 O X 0])))
+  (it "returns 0 if there is no winner or a tie"
+    (should= nil (winner [0 0 0 0 0 0 0 0 0]))
+    (should= nil (winner [X O X O X O O X O]))))
 
-  (should= '({1 "O", 2 "O", 3 "O", 4 "O"}
-             {1 "O", 2 "O", 3 "O", 5 "O"}
-             {1 "O", 2 "O", 3 "O", 6 "O"}
-             {1 "O", 2 "O", 3 "O", 7 "O"}
-             {1 "O", 2 "O", 3 "O", 8 "O"}
-             {1 "O", 2 "O", 3 "O", 9 "O"})
-        (next-boards O {1 O 2 O 3 O})))
+(describe "game-ended?"
+  (it "returns false if the board is empty"
+    (should= false (game-ended? [0 0 0 0 0 0 0 0 0])))
+  (it "returns false if the game still has possible moves"
+    (should= false (game-ended? [X O X 0 0 0 0 0 0])))
+  (it "returns true if X has won"
+    (should= true (game-ended? [X X X 0 0 0 0 0 0])))
+  (it "returns true if O has won"
+    (should= true (game-ended? [O O O 0 0 0 0 0 0])))
+  (it "returns true if the board is full"
+    (should= true (game-ended? [O X O X O X X O X]))))
 
-	(it "This should return the opposite player of the one passed to the function."
-		(should= O (other-player X))
-		(should= X (other-player O))
-		(should= nil (other-player "G")))
+(describe "full-board?"
+  (it "returns false if the board is empty"
+    (should= false (full-board? [0 0 0 0 0 0 0 0 0])))
+  (it "returns false if the board has 4 moves in it"
+    (should= false (full-board? [0 0 0 X 0 0 0 O 0 0 0 X 0 0 0 O])))
+  (it "returns true if the board is full"
+    (should= true (full-board? [X O X X O X O X O X])))
+  (it "extra test case"
+    (should= false (full-board? [O X X X X X O 0 O 0]))))
 
-	(it "Should return all of the empty spaces on the board."
-		(should= '(1 2 3 4 5 6 7 8 9) (empty-spaces empty-board))
-		(should= '(1 3 5 7 9) (empty-spaces {2 X 4 O 6 X 8 O}))
-		(should= '() (empty-spaces {1 X 2 X 3 X 4 O 5 O 6 O 7 O 8 O 9 X})))
+(describe "empty-spaces"
+  (it "returns an empty seq on a full board"
+    (should= [] (empty-spaces [X O X O X O O X O])))
+  (it "returns a vector of the indexes of the empty spaces in a board"
+    (should= [1 2 3] (empty-spaces [X 0 0 0 X O X O X])))
+  (it "when given an empty board it returns all empty spaces"
+    (should= [0 1 2 3 4 5 6 7 8] (empty-spaces [0 0 0 0 0 0 0 0 0]))))
 
-	(it "Should return true if the game is full and false if there are places yet to go"
-		(should= false (full-board? {}))
-		(should= false (full-board? {1 X 2 O 3 X}))
-		(should= true (full-board? {1 X 2 X 3 X 4 O 5 O 6 O 7 O 8 O 9 X}))))
+(describe "other-player"
+  (it "given X the other player is O"
+    (should= O (other-player X)))
+  (it "given O the other player is X"
+    (should= X (other-player O)))
+  (it "given a non X or O character return nil"
+    (should= nil (other-player "G"))))
 
-(describe "Current depth - "
-  (it "Introspect the board to return the current depth."
-    (should= 0 (current-depth {}))
-    (should= 1 (current-depth {1 X}))
-    (should= 2 (current-depth {1 X 2 O}))
-    (should= 3 (current-depth {1 X 2 O 3 X}))
-    (should= 4 (current-depth {1 X 2 O 3 X
-                               4 O }))
-    (should= 5 (current-depth {1 X 2 O 3 X
-                               4 O 5 X }))
-    (should= 6 (current-depth {1 X 2 O 3 X
-                               4 O 5 X 6 X}))
-    (should= 7 (current-depth {1 X 2 O 3 X
-                               4 O 5 X 6 X
-                               7 O }))
-    (should= 8 (current-depth {1 X 2 O 3 X
-                               4 O 5 X 6 X
-                               7 O 8 X }))
-    (should= 9 (current-depth {1 X 2 O 3 X
-                               4 O 5 X 6 X
-                               7 O 8 X 9 O}))))
+(describe "next-boards"
+  (it "returns no boards when the board is full"
+    (should= [] (next-boards X [X O X X O X O X O])))
+  (it "returns 3 boards with the player having moved into each empty spot"
+    (should= [[X O X O X O X 0 0] [X O X O X O 0 X 0] [X O X O X O 0 0 X]]
+              (next-boards X [X O X O X O 0 0 0]))))
+
 (run-specs)
 

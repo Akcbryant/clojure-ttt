@@ -1,36 +1,40 @@
-(ns clojure-ttt.board)
+(ns clojure-ttt.board
+  (:require [clojure.core.matrix :as matrix]))
 
-(def X "X")
-(def O "O")
-(def empty-board {})
-(def winning-vectors [[1,2,3] [4,5,6] [7,8,9] [1,5,9] [1,4,7] [2,5,8] [3,6,9] [3,5,7]])
+(def X 1)
+(def O -1)
 
 (declare full-board?)
 
 (defn make-move [board position player]
-  (merge board {position player}))
+  (assoc board position player))
 
 (defn valid-move? [board position]
-  (if (get board position) false
-    true))
+  (zero? (get board position)))
 
-(defn winner-check [board]
-  (for [vector winning-vectors]
-    (if (and (= (board (first vector)) (board (second vector)) (board (last vector))) (not= (board (first vector)) nil))
-      (board (first vector))
-      nil)))
+(defn board-width [board]
+  (int (Math/sqrt (count board))))
+
+(defn board-matrix [board]
+  (partition (board-width board) board))
+
+(defn rows-columns [board-matrix]
+  (concat board-matrix (matrix/columns board-matrix)))
+
+(defn diagonals [board-matrix]
+  (vector (matrix/diagonal board-matrix) (matrix/diagonal (matrix/transpose board-matrix))))
 
 (defn winner [board]
-  (some #{X O} (winner-check board)))
-
-(defn whose-turn [board]
-  (if (and (>= (count board) 0) (< (count board) 9))
-    (cond (even? (count board)) X
-          (odd? (count board)) O)
-    nil))
+  (let [board-matrix (board-matrix board)
+        board-width (board-width board)
+        all-vectors (concat (rows-columns board-matrix) (diagonals board-matrix))
+        all-values (map #(reduce + %) all-vectors)]
+    (cond (some #{board-width} all-values) X
+          (some #{(- board-width)} all-values) O
+          :else nil)))
 
 (defn game-ended? [board]
-  (if (or (full-board? board) (winner board)) 
+  (if (or (full-board? board) (winner board))
     true
     false))
 
@@ -40,7 +44,7 @@
     :else nil))
 
 (defn empty-spaces [board]
-  (remove (fn [k] (contains? board k)) (range 1 10)))
+  (map first (filter #(= (second %) 0) (map-indexed vector board))))
 
 (defn full-board? [board]
   (if (empty? (empty-spaces board)) 
@@ -49,6 +53,3 @@
 
 (defn next-boards [player board]
   (map #(make-move board % player) (empty-spaces board)))
-
-(defn current-depth [board]
-  (count board))

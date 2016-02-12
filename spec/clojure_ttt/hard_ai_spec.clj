@@ -3,30 +3,36 @@
         [clojure-ttt.hard-ai :refer :all]
         [clojure-ttt.board :refer :all]))
 
-(describe "Minimax and AI Functions"
+(describe "score-board"
+  (it "return 10 when it is X's turn and X has won with 0 depth"
+    (should= 10 (score-board X [X X X] 0 true)))
+  (it "return -10 when it is O's turn and X wins (maximizing for O)"
+    (should= -10 (score-board O [X X X] 0 true)))
+  (it "return 6 when there is a depth of 6 for a maximizing player"
+    (should= 6 (score-board O [O O O] 4 true)))
+  (it "return -5 when the maximizing person loses at depth of 5"
+    (should= -5 (score-board X [O O O] 5 true)))
+  (it "return 1 when the minimizing person loses at depth of 9"
+    (should= 1 (score-board O [X X X] 9 false)))
+  (it "return 0 when there is a tie for the maximizing player"
+    (should= 0 (score-board X [X O X O O X X X O] 6 true)))
+  (it "return 0 when there is a tie for the minimizing player"
+    (should= 0 (score-board O [X O X O O X X X O] 6 true))))
 
-  (it "Return 10 - depth or -10 + depth depending on perspective"
-    (should= 10 (score-board X {1 X 2 X 3 X} 0 true))
-    (should= -10 (score-board O {1 X 2 X 3 X} 0 true))
-    (should= 6 (score-board O {1 O 2 O 3 O} 4 true))
-    (should= -5 (score-board X {1 O 2 O 3 O} 5 true))
-    (should= -5 (score-board X {1 X 2 X 3 X} 5 false))
-    (should= 1 (score-board O {1 X 2 X 3 X} 9 false))
-    (should= -1 (score-board O {1 O 2 O 3 O} 9 false))
-    (should= 9 (score-board X {1 O 2 O 3 O} 1 false))
-    (should= 0 (score-board X {1 X 2 O 3 X
-                               4 O 5 O 6 X 
-                               7 X 8 X 9 O} 6 true))
-    (should= 0 (score-board O {1 X 2 O 3 X
-                               4 O 5 O 6 X 
-                               7 X 8 X 9 O} 9 true)))
+(describe "best-move"
+  (it "should win in space 6"
+    (should= 6 (best-move [O X X
+                           X X O
+                           0 O 0] O 7)))
+  (it "should win in space 6"
+    (should= 6 (best-move [X O 0
+                           X O 0
+                           0 0 X] X 4)))
+  (it "should pick the optimal spot 4"
+    (should= 4 (best-move [O X O
+                           X 0 0
+                           0 0 0] X 3))))
 
-  (it "best-move should return the next optimal move."
-    (should= 7 (best-move {1 O 2 X 3 X 4 X 5 X 6 O 8 O} O 2))
-    (should= 7 (best-move {1 X 2 O 4 X 5 O 9 X} O 4))
-    (should= 5 (best-move {1 O 2 X 3 O 4 X} X 5))
-    (should= 9 (best-move {} X 9))))
-
-(describe "When asked to make a move"
-  (it "returns a board with the next move made"
-    (should= {1 O 2 O 3 X 6 X 9 X} (move {1 O 2 O 6 X 9 X} X))))
+(describe "move"
+  (it "returns a board with the X moving to  move made"
+    (should= [O O X 0 0 X 0 0 X] (move [O O 0 0 0 X 0 0 X] X))))

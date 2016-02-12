@@ -15,7 +15,6 @@
     (should= 1 (with-in-str "1" (how-many-humans))))
   (it "There are 2 human players."
     (should= 2 (with-in-str "2" (how-many-humans))))
-
   (it "Accepts X as the piece should return X."
     (should= "X" (with-in-str "X" (get-piece))))
   (it "Accepts O as the piece should return O."
@@ -29,8 +28,8 @@
     (should= 1 (with-in-str "1" (get-move "player2"))))
   (it "Gets move 5 for player1"
     (should= 5 (with-in-str "5" (get-move "player1"))))
-  ; (it "Sends an error message if get-move is given a letter."
-  ;   (should= (with-out-str (input-error)) (with-in-str "q" (get-move "player1")))
+;  (it "Sends an error message if get-move is given a letter."
+;    (should= (with-out-str (input-error)) (with-in-str "q" (get-move "player1"))))
 
 
   (it "Displays the winner is Player 1."
